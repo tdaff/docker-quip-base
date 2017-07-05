@@ -12,4 +12,5 @@ Stack contains:
  - Python image (based on debian)
  - OpenMP OpenBLAS
  - numpy, scipy, matplotlib, ase
+ - Julia
 
