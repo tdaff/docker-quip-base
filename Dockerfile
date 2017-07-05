@@ -17,12 +17,12 @@ RUN apt-get -y update \
 
 # Custom install of openblas so OpenMP can be used
 # otherwise linear algebra is limited to single core
-RUN mkdir -p /opt/OpenBLAS/ \
-    && git clone https://github.com/xianyi/OpenBLAS.git /opt/OpenBLAS/src
-RUN cd /opt/OpenBLAS/src \
+# NUM_THREADS must be set otherwise docker hub builds
+# non-parallel version
+RUN git clone https://github.com/xianyi/OpenBLAS.git /tmp/OpenBLAS
+RUN cd /tmp/OpenBLAS/ \
     && make DYNAMIC_ARCH=1 NO_AFFINITY=1 USE_OPENMP=1 NUM_THREADS=32 \
-    && make DYNAMIC_ARCH=1 install \
-    && rm -rf /opt/OpenBLAS/src
+    && make DYNAMIC_ARCH=1 NO_AFFINITY=1 USE_OPENMP=1 NUM_THREADS=32 install
 
 # Make openblas the default
 RUN update-alternatives --install /usr/lib/libblas.so libblas.so /opt/OpenBLAS/lib/libopenblas.so 1000
