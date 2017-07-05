@@ -11,7 +11,9 @@ RUN apt-get -y update \
         liblapack-dev \
         libblas-dev \
         libnetcdf-dev \
-        netcdf-bin
+        netcdf-bin \
+        curl \
+        libzmq3
 
 # Custom install of openblas so OpenMP can be used
 # otherwise linear algebra is limited to single core
@@ -31,4 +33,18 @@ RUN ldconfig
 
 RUN pip install --upgrade pip
 RUN pip install notebook numpy scipy matplotlib ase
+
+# add Julia for anyone who'd like it
+ENV JULIA_PATH /opt/julia
+ENV JULIA_VERSION 0.6.0
+
+# Don't store the intermediate file
+RUN mkdir $JULIA_PATH \
+    && cd $JULIA_PATH \
+    && curl "https://julialang-s3.julialang.org/bin/linux/x64/${JULIA_VERSION%[.-]*}/julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | tar xz --strip-components 1 
+
+ENV PATH $JULIA_PATH/bin:$PATH
+
+RUN julia -e 'Pkg.add("IJulia")'
+RUN julia -e 'Pkg.add("PyCall")'
 
